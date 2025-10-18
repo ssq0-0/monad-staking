@@ -6,6 +6,7 @@ type (
 		Delay           Range    `yaml:"delay"`
 		Validators      []string `yaml:"validators"`
 		PrivateKeysFile string   `yaml:"privateKeysFile"`
+		RPCString       string   `yaml:"rpc"`
 	}
 
 	Range struct {

@@ -10,65 +10,34 @@ import (
 	client "ms/internal/client/consts"
 
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"golang.org/x/sync/errgroup"
 )
 
-var GlobalETHClient map[string]*EthClient
-
 type EthClient struct {
-	Client *ethclient.Client
+	client *ethclient.Client
 }
 
-func EthClientFactory(rpcs map[string]string) error {
-	if len(rpcs) == 0 {
-		return errors.New("RPC URLs map is empty")
+func NewEthClient(ctx context.Context, rpc string) (*EthClient, error) {
+	if strings.TrimSpace(rpc) == "" {
+		return nil, errors.New("RPC is nil")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var (
-		result = make(map[string]*EthClient)
-		mu     sync.Mutex
-		g, _   = errgroup.WithContext(ctx)
-	)
-
-	for name, rpc := range rpcs {
-		name, rpc := name, rpc
-		g.Go(func() error {
-			client, err := ethclient.DialContext(ctx, rpc)
-			if err != nil {
-				return fmt.Errorf("error connecting to RPC %s: %v", name, err)
-			}
-			mu.Lock()
-			result[name] = &EthClient{Client: client}
-			mu.Unlock()
-			return nil
-		})
+	client, err := ethclient.DialContext(ctx, rpc)
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to RPC %s: %v", rpc, err)
 	}
 
-	if err := g.Wait(); err != nil {
-		return err
-	}
-
-	GlobalETHClient = result
-
-	return nil
-}
-
-func CloseAllClients(clients map[string]*EthClient) {
-	for _, client := range clients {
-		if client.Client != nil {
-			client.Client.Close()
-		}
-	}
+	return &EthClient{
+		client: client,
+	}, nil
 }
 
 func (c *EthClient) BalanceCheck(owner, tokenAddr common.Address) (*big.Int, error) {
@@ -246,7 +215,7 @@ func (c *EthClient) Allowance(tokenAddr, owner, spender common.Address) (*big.In
 	return allowance, nil
 }
 
-func (c *EthClient) SendTransaction(privateKey *ecdsa.PrivateKey, ownerAddr, CA common.Address, value float32) error {
+func (c *EthClient) SendTransaction(ctx context.Context, amount float32, to string, privatekey *ecdsa.PrivateKey) error {
 	chainID, err := c.Client.NetworkID(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to get ChainID: %v", err)
