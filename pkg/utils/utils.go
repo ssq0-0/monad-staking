@@ -12,6 +12,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
+var rgx = regexp.MustCompile(`^[0-9a-fA-F]+$`).MatchString
+
 func ParsePrivateKey(hexKey string) (*ecdsa.PrivateKey, error) {
 	if len(hexKey) != 64 && len(hexKey) != 66 {
 		return nil, errors.New("invalid private key: incorrect length")
@@ -21,8 +23,7 @@ func ParsePrivateKey(hexKey string) (*ecdsa.PrivateKey, error) {
 		hexKey = hexKey[2:]
 	}
 
-	isHex := regexp.MustCompile(`^[0-9a-fA-F]+$`).MatchString
-	if !isHex(hexKey) {
+	if !rgx(hexKey) {
 		return nil, errors.New("invalid private key: contains non-hexadecimal characters")
 	}
 
