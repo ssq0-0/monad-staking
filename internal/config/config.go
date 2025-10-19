@@ -2,11 +2,12 @@ package config
 
 type (
 	AppConfig struct {
-		Stake           Range    `yaml:"stake"`
-		Delay           Range    `yaml:"delay"`
-		Validators      []string `yaml:"validators"`
-		PrivateKeysFile string   `yaml:"privateKeysFile"`
-		RPCString       string   `yaml:"rpc"`
+		Stake           Range   `yaml:"stake"`
+		Delay           Range   `yaml:"delay"`
+		Validators      []uint8 `yaml:"validators"`
+		ContractAddress string  `yaml:"contractAddress"`
+		PrivateKeysFile string  `yaml:"privateKeysFile"`
+		RPCString       string  `yaml:"rpc"`
 	}
 
 	Range struct {

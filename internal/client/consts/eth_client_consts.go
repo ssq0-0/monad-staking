@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"log"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 )
@@ -21,12 +22,6 @@ func SetInit() {
 	}
 }
 
-// Interpretation for file paths
-var (
-	AppConfiguration = "config"
-	UserConfig       = "userConfig"
-)
-
 // ####### Default GLOBALS #########
 var (
 	// Max approve value.
@@ -35,8 +30,15 @@ var (
 	// Default ABI for erc20 tokens
 	Erc20ABI *abi.ABI
 
-	// Console title name.
-	ConsoleTitle = "Cheif Machine | cheif.ssq"
+	EthDecimal = 18
+
+	RetryCount = 5
+
+	ExploerTx = "https://testnet.monadexplorer.com/tx"
+
+	WaitingTimeout = 1 * time.Minute
+
+	DelegateSelector = "84994fec"
 )
 
 // ###### Base ERC20 ABI. #######

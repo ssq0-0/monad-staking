@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math/big"
 	"math/rand/v2"
 	"regexp"
 
@@ -62,4 +63,20 @@ func RandomSliceValue[T any](slc []T) T {
 		panic("cannot pick random value from empty slice")
 	}
 	return slc[rand.IntN(len(slc))]
+}
+
+func ConvertToWei(amount float64, decimals int) (*big.Int, error) {
+	amountFloat := new(big.Float).SetFloat64(amount)
+
+	multiplier := new(big.Float).SetFloat64(1)
+	for i := 0; i < decimals; i++ {
+		multiplier.Mul(multiplier, new(big.Float).SetFloat64(10))
+	}
+
+	amountWei := new(big.Float).Mul(amountFloat, multiplier)
+
+	wei := new(big.Int)
+	amountWei.Int(wei)
+
+	return wei, nil
 }

@@ -51,5 +51,9 @@ func validateConfig(config *AppConfig) error {
 		return fmt.Errorf("путь к файлу с приватными ключами не может быть пустым")
 	}
 
+	if config.RPCString == "" {
+		return fmt.Errorf("RPC строка не может быть пустой")
+	}
+
 	return nil
 }
